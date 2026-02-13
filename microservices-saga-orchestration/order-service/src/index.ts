@@ -1,6 +1,6 @@
-import { connectDB } from "./db.ts";
-import { pool } from "./db.ts";
-
+import { connectDB } from "./db";
+import { pool } from "./db";
+import { insertOrder, showOrders } from "./model";
 const startServer = async () => {
   await connectDB();
   console.log("Order Service Started");

@@ -1,22 +1,16 @@
 import { pool } from "./db";
 
-export const insertOrder = async (
-  userID: string,
-  productID: string,
-  quantity: number,
-  amount: number,
-  status: string,
-) => {
+import { OrderStatus, OrderData } from "./types/types";
+
+export const insertOrder = async (data: OrderData) => {
   try {
     const result = await pool.query(
       `
     INSERT INTO orders (user_id, product_id, quantity, amount, status)
     VALUES ($1, $2, $3, $4, $5)
     RETURNING id;
-
-
     `,
-      [userID, productID, quantity, amount, status],
+      [data.user_id, data.product_id, data.quantity, data.amount, data.status],
     );
     return result.rows[0].id;
   } catch (error) {
@@ -69,32 +63,7 @@ export const getOrderById = async (orderId: string) => {
   }
 };
 
-export const updateOrder = async (
-  orderID: string,
-  userID: string,
-  productID: string,
-  quantity: number,
-  amount: number,
-  status: string,
-) => {
-  try {
-    const result = await pool.query(
-      `
-    UPDATE orders
-    SET user_id = $2, product_id = $3, quantity = $4, amount = $5, status = $6
-    WHERE id = $1
-    RETURNING id;
-    `,
-      [orderID, userID, productID, quantity, amount, status],
-    );
-    return result.rows[0].id;
-  } catch (error) {
-    console.log("Error Updating Order");
-    throw error;
-  }
-};
-
-export const deleteOrder = async (orderID: string) => {
+export const deleteOrderById = async (orderID: string) => {
   try {
     const result = await pool.query(
       `
@@ -122,6 +91,27 @@ export const deleteOrders = async () => {
     return result.rows.map((row: any) => row.id);
   } catch (error) {
     console.log("Error Deleting Orders");
+    throw error;
+  }
+};
+
+export const updateOrderStatus = async (
+  orderID: string,
+  status: OrderStatus,
+) => {
+  try {
+    const result = await pool.query(
+      `
+    UPDATE orders
+    SET status = $2
+    WHERE id = $1
+    RETURNING id;
+    `,
+      [orderID, status],
+    );
+    return result.rows[0].id;
+  } catch (error) {
+    console.log("Error Updating Order Status");
     throw error;
   }
 };
