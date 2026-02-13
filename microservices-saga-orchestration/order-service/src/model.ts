@@ -39,6 +39,36 @@ export const showOrders = async () => {
   }
 };
 
+export const getOrdersByUser = async (userId: string) => {
+  try {
+    const result = await pool.query(
+      `
+       SELECT * FROM orders WHERE user_id = $1;
+      `,
+      [userId],
+    );
+    return result.rows;
+  } catch (error) {
+    console.log("Error getting orders by user");
+    throw error;
+  }
+};
+
+export const getOrderById = async (orderId: string) => {
+  try {
+    const result = await pool.query(
+      `
+       SELECT * FROM orders WHERE id = $1;
+      `,
+      [orderId],
+    );
+    return result.rows[0];
+  } catch (error) {
+    console.log("Error getting order by id");
+    throw error;
+  }
+};
+
 export const updateOrder = async (
   orderID: string,
   userID: string,
