@@ -1,5 +1,6 @@
 import { connectDB } from "./db.ts";
 import { pool } from "./db.ts";
+
 const startServer = async () => {
   await connectDB();
   console.log("Order Service Started");
