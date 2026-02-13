@@ -12,6 +12,7 @@ export const pool = new Pool({
 });
 
 export const connectDB = async () => {
+  console.log("ENV TEST:", process.env.DB_PASSWORD);
   try {
     await pool.connect();
     console.log("Connected to database");
