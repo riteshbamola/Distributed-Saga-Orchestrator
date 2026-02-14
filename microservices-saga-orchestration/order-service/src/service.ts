@@ -1,6 +1,6 @@
 import * as orderRepository from "./model";
 import { OrderStatus, CreateOrderDTO, OrderData } from "./types/types";
-
+import { producer } from "./kafka";
 const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
   [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
   [OrderStatus.CONFIRMED]: [OrderStatus.CANCELLED],
@@ -25,8 +25,31 @@ export const createOrder = async (data: CreateOrderDTO) => {
     status: OrderStatus.PENDING,
   };
 
-  const order = await orderRepository.insertOrder(orderData);
-  return order;
+  const orderId = await orderRepository.insertOrder(orderData);
+
+  // publish event order.created
+  try {
+    await producer.send({
+      topic: "order.created",
+      messages: [
+        {
+          key: orderId,
+          value: JSON.stringify({
+            eventId: crypto.randomUUID(),
+            orderId,
+            ...orderData,
+            occurredAt: new Date().toISOString(),
+          }),
+        },
+      ],
+    });
+
+  } catch (error) {
+    console.error("Failed to publish order.created", error);
+    throw new Error("Order created but event publishing failed");
+  }
+
+  return orderId;
 };
 
 export const getOrder = async (id: string) => {
