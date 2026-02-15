@@ -1,5 +1,5 @@
 import { Kafka } from "kafkajs";
-
+import * as service from "./service";
 const kafka = new Kafka({
   clientId: "inventory-service",
   brokers: ["localhost:9092"],
@@ -53,6 +53,17 @@ export const connectKafka = async () => {
               `Received message from ${topic}: ${message.value?.toString()}`,
             );
             break;
+
+          case "inventory.reserve":
+            const data = JSON.parse(message.value?.toString() || "{}");
+            await service.reserveInventory(data);
+            break;
+
+          case "inventory.release":
+            const releaseData = JSON.parse(message.value?.toString() || "{}");
+            await service.releaseInventory(releaseData);
+            break;
+
         }
 
         await consumer.commitOffsets([
