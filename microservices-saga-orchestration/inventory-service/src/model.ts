@@ -2,7 +2,7 @@ import { pool } from "./db";
 
 export const reserveInventory = async (
   orderId: string,
-  productId: number,
+  productId: string,
   quantity: number,
 ) => {
   const client = await pool.connect();
