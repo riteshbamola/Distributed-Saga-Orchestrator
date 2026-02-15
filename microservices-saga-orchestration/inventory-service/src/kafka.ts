@@ -39,14 +39,7 @@ export const connectKafka = async () => {
   await consumer.connect();
 
   await consumer.subscribe({
-    topics: [
-      "inventory.reserve",
-      "inventory.release",
-      "inventory.reserved",
-      "inventory.released",
-      "inventory.failed",
-      "inventory.handshake",
-    ],
+    topics: ["inventory.reserve", "inventory.release", "inventory.handshake"],
     fromBeginning: false,
   });
 
