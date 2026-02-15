@@ -2,7 +2,7 @@ import { pool } from "./db";
 
 export const reserveInventory = async (
   orderId: string,
-  productId: string,
+  productId: number,
   quantity: number,
 ) => {
   const client = await pool.connect();
@@ -10,6 +10,23 @@ export const reserveInventory = async (
   try {
     await client.query("BEGIN");
 
+    // 1️⃣ Check if reservation already exists
+    const existing = await client.query(
+      `
+      SELECT status
+      FROM inventory_reservations
+      WHERE order_id = $1
+      AND product_id = $2
+      `,
+      [orderId, productId],
+    );
+
+    if ((existing.rowCount ?? 0) > 0) {
+      await client.query("ROLLBACK");
+      return { status: existing.rows[0].status };
+    }
+
+    // 2️⃣ Deduct stock safely
     const updateResult = await client.query(
       `
       UPDATE inventory
@@ -25,12 +42,14 @@ export const reserveInventory = async (
       return { status: "FAILED" };
     }
 
+    // 3️⃣ Insert reservation
     await client.query(
       `
-      INSERT INTO inventory_reservations (order_id, product_id, quantity, status)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO inventory_reservations
+      (order_id, product_id, quantity, status)
+      VALUES ($1, $2, $3, 'RESERVED')
       `,
-      [orderId, productId, quantity, "RESERVED"],
+      [orderId, productId, quantity],
     );
 
     await client.query("COMMIT");
@@ -38,8 +57,7 @@ export const reserveInventory = async (
     return { status: "RESERVED" };
   } catch (error) {
     await client.query("ROLLBACK");
-    console.error(error);
-    throw new Error("Inventory reservation failed");
+    throw error;
   } finally {
     client.release();
   }
