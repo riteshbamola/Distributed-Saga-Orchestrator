@@ -1,5 +1,5 @@
 import { Kafka } from "kafkajs";
-
+import * as service from "./service";
 const kafka = new Kafka({
   clientId: "payment-service",
   brokers: ["localhost:9092"],
@@ -53,6 +53,11 @@ export const connectKafka = async () => {
             console.log(
               `Received message from ${topic}: ${message.value?.toString()}`,
             );
+            break;
+
+          case "payment.request":
+            const data = JSON.parse(message.value?.toString() || "{}");
+            await service.createPayment(data);
             break;
         }
 
