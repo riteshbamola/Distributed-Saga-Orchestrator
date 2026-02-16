@@ -1,4 +1,5 @@
 import { Kafka } from "kafkajs";
+import { handleMessage } from "./handlers";
 const kafka = new Kafka({
   clientId: "saga-orchestrator",
   brokers: ["localhost:9092"],
@@ -14,6 +15,8 @@ const createTopics = async () => {
       topics: [
         // order service
         { topic: "order.created", numPartitions: 3, replicationFactor: 1 },
+        { topic: "order.cancel", numPartitions: 3, replicationFactor: 1 },
+        {topic: "order.confirm",numPartitions: 3, replicationFactor: 1}
         { topic: "order.confirmed", numPartitions: 3, replicationFactor: 1 },
         { topic: "order.cancelled", numPartitions: 3, replicationFactor: 1 },
         { topic: "order.handshake", numPartitions: 1, replicationFactor: 1 },
@@ -21,8 +24,10 @@ const createTopics = async () => {
         //inventory service
         { topic: "inventory.reserve", numPartitions: 3, replicationFactor: 1 },
         { topic: "inventory.release", numPartitions: 3, replicationFactor: 1 },
+        { topic: "inventory.complete", numPartitions: 3, replicationFactor: 1 },
         { topic: "inventory.reserved", numPartitions: 3, replicationFactor: 1 },
         { topic: "inventory.released", numPartitions: 3, replicationFactor: 1 },
+        { topic: "inventory.completed", numPartitions: 3, replicationFactor: 1 },
         { topic: "inventory.failed", numPartitions: 3, replicationFactor: 1 },
         {
           topic: "inventory.handshake",
@@ -66,6 +71,7 @@ export const connectKafka = async () => {
       "order.cancelled",
       "inventory.reserved",
       "inventory.released",
+      "inventory.completed",
       "inventory.failed",
       "payment.success",
       "payment.failed",
@@ -77,30 +83,7 @@ export const connectKafka = async () => {
     autoCommit: false,
     eachMessage: async ({ topic, partition, message }) => {
       try {
-        switch (topic) {
-          //orders
-          case "order.created":
-            console.log("Thanks Received");
-            break;
-          case "order.confirmed":
-            break;
-
-          //inventory
-          case "inventory.reserved":
-            break;
-          case "inventory.failed":
-            break;
-          case "inventory.released":
-            break;
-
-          //payment
-          case "payment.success":
-            break;
-
-          case "payment.failed":
-            break;
-        }
-
+        await handleMessage(topic, message);
         await consumer.commitOffsets([
           {
             topic,
