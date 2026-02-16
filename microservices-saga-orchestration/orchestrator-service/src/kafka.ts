@@ -22,7 +22,6 @@ const createTopics = async () => {
         //inventory service
         { topic: "inventory.reserve", numPartitions: 3, replicationFactor: 1 },
         { topic: "inventory.release", numPartitions: 3, replicationFactor: 1 },
-        { topic: "inventory.complete", numPartitions: 3, replicationFactor: 1 },
         { topic: "inventory.reserved", numPartitions: 3, replicationFactor: 1 },
         { topic: "inventory.released", numPartitions: 3, replicationFactor: 1 },
         {

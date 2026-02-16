@@ -80,7 +80,7 @@ export const completeInventory = async (data: sagaDTO) => {
   try {
     const result = await repository.completeInventory(orderID, productID);
 
-    const topic = "inventory.confirmed";
+    const topic = "inventory.completed";
 
     const newdata: sagaDTO = {
       orderID: orderID,

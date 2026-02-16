@@ -181,7 +181,7 @@ export const handlePaymentSuccess = async (data: sagaDTO) => {
     };
 
     await producer.send({
-      topic: "inventory.complete",
+      topic: "inventory.completed",
       messages: [
         {
           key: step.order_id,
