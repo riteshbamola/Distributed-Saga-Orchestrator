@@ -148,9 +148,8 @@ export const handleinventoryCompleted = async (data: sagaDTO) => {
       quantity: quantity,
       amount: amount,
     };
-    //compensating logic
-    producer.send({
-      topic: "order.cancel",
+    await producer.send({
+      topic: "order.confirm",
       messages: [
         {
           key: orderID,

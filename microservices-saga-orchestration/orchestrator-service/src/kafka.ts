@@ -17,8 +17,6 @@ const createTopics = async () => {
         { topic: "order.created", numPartitions: 3, replicationFactor: 1 },
         { topic: "order.cancel", numPartitions: 3, replicationFactor: 1 },
         { topic: "order.confirm", numPartitions: 3, replicationFactor: 1 },
-        { topic: "order.confirmed", numPartitions: 3, replicationFactor: 1 },
-        { topic: "order.cancelled", numPartitions: 3, replicationFactor: 1 },
         { topic: "order.handshake", numPartitions: 1, replicationFactor: 1 },
 
         //inventory service
@@ -71,8 +69,6 @@ export const connectKafka = async () => {
   await consumer.subscribe({
     topics: [
       "order.created",
-      "order.confirmed",
-      "order.cancelled",
       "inventory.reserved",
       "inventory.released",
       "inventory.completed",
