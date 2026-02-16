@@ -5,26 +5,6 @@ const kafka = new Kafka({
   brokers: ["localhost:9092"],
 });
 
-const admin = kafka.admin();
-
-const createTopics = async () => {
-  await admin.connect();
-
-  await admin.createTopics({
-    topics: [
-      { topic: "inventory.reserve", numPartitions: 3, replicationFactor: 1 },
-      { topic: "inventory.release", numPartitions: 3, replicationFactor: 1 },
-      { topic: "inventory.reserved", numPartitions: 3, replicationFactor: 1 },
-      { topic: "inventory.released", numPartitions: 3, replicationFactor: 1 },
-      { topic: "inventory.failed", numPartitions: 3, replicationFactor: 1 },
-      { topic: "inventory.handshake", numPartitions: 1, replicationFactor: 1 },
-    ],
-    waitForLeaders: true,
-  });
-
-  await admin.disconnect();
-};
-
 export const producer = kafka.producer({
   allowAutoTopicCreation: false,
 });
@@ -34,7 +14,6 @@ export const consumer = kafka.consumer({
 });
 
 export const connectKafka = async () => {
-  await createTopics();
   await producer.connect();
   await consumer.connect();
 
@@ -63,7 +42,6 @@ export const connectKafka = async () => {
             const releaseData = JSON.parse(message.value?.toString() || "{}");
             await service.releaseInventory(releaseData);
             break;
-
         }
 
         await consumer.commitOffsets([

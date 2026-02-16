@@ -1,9 +1,5 @@
 import { Kafka } from "kafkajs";
 
-// ----------------------
-// Kafka Setup
-// ----------------------
-
 const kafka = new Kafka({
   clientId: "order-service",
   brokers: ["localhost:9092"],
@@ -17,27 +13,7 @@ export const consumer = kafka.consumer({
   groupId: "order-service-group",
 });
 
-const admin = kafka.admin();
-
-const createTopics = async () => {
-  await admin.connect();
-
-  await admin.createTopics({
-    topics: [
-      { topic: "order.created", numPartitions: 3, replicationFactor: 1 },
-      { topic: "order.confirm", numPartitions: 3, replicationFactor: 1 },
-      { topic: "order.cancel", numPartitions: 3, replicationFactor: 1 },
-      { topic: "order.handshake", numPartitions: 1, replicationFactor: 1 },
-    ],
-    waitForLeaders: true,
-  });
-
-  await admin.disconnect();
-};
-
 export const connectKafka = async () => {
-  await createTopics();
-
   await producer.connect();
   await consumer.connect();
 

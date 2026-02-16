@@ -10,37 +10,12 @@ const admin = kafka.admin();
 export const producer = kafka.producer();
 export const consumer = kafka.consumer({ groupId: "payment-service-group" });
 
-const createTopics = async () => {
-  try {
-    await admin.connect();
-
-    await admin.createTopics({
-      topics: [
-        { topic: "payment.request", numPartitions: 3, replicationFactor: 1 },
-        { topic: "payment.success", numPartitions: 3, replicationFactor: 1 },
-        { topic: "payment.failure", numPartitions: 3, replicationFactor: 1 },
-        { topic: "payment.handshake", numPartitions: 3, replicationFactor: 1 },
-      ],
-    });
-
-    await admin.disconnect();
-  } catch (error) {
-    console.error("Error creating topics:", error);
-  }
-};
-
 export const connectKafka = async () => {
-  await createTopics();
   await producer.connect();
   await consumer.connect();
 
   await consumer.subscribe({
-    topics: [
-      "payment.request",
-      "payment.success",
-      "payment.failure",
-      "payment.handshake",
-    ],
+    topics: ["payment.request", "payment.handshake"],
     fromBeginning: false,
   });
 
