@@ -4,17 +4,16 @@ export enum OrderStatus {
   CANCELLED = "CANCELLED",
 }
 
-export interface OrderData {
+export interface CreateOrderDTO {
   user_id: string;
   product_id: string;
   quantity: number;
   amount: number;
-  status: OrderStatus;
 }
 
-export interface CreateOrderDTO {
-  user_id: string;
-  product_id: string;
+export interface OrderCreatedDTO {
+  orderId: string;
+  productId: string;
   quantity: number;
   amount: number;
 }
