@@ -9,12 +9,11 @@ export async function createPayment(data: createPaymentDTO) {
     const paymentId = result.insertId;
     const status = result.status;
 
-    const topic =
-      status === "SUCCESS" ? "payments.success" : "payments.failure";
+    const topic = status === "SUCCESS" ? "payments.success" : "payments.failed";
 
     await producer.send({
       topic: "topic",
-      messages: [{ value: JSON.stringify({ orderId, amount }) }],
+      messages: [{ value: JSON.stringify({ order_id, amount }) }],
     });
   } catch (error) {
     console.error("Error creating payment:", error);
