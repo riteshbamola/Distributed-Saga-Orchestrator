@@ -4,7 +4,7 @@ A learning-focused implementation of the Saga Pattern using a Centralized Orches
 
 ## 🏗️ Architecture Overview
 
-![Architecture Diagram](images/architecture.png)
+![Architecture Diagram](images/Architecture.png)
 
 The system coordinates a distributed transaction across four main components:
 
