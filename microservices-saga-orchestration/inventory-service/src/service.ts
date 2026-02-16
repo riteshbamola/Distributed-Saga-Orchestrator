@@ -1,28 +1,36 @@
 import { pool } from "./db";
 import * as repository from "./model";
-import { inventoryReserveDTO } from "./types/types";
+import { sagaDTO } from "./types/types";
 
 import { producer } from "./kafka";
 
-export const reserveInventory = async (data: inventoryReserveDTO) => {
-  const { order_id, product_id, quantity } = data;
+export const reserveInventory = async (data: sagaDTO) => {
+  const { orderID, productID, quantity } = data;
 
   try {
     const result = await repository.reserveInventory(
-      order_id,
-      product_id,
+      orderID,
+      productID,
       quantity,
     );
 
     const topic =
       result.status === "RESERVED" ? "inventory.reserved" : "inventory.failed";
 
+    const newdata: sagaDTO = {
+      orderID: orderID,
+      sagaID: data.sagaID,
+      productID: productID,
+      quantity: quantity,
+      amount: data.amount,
+    };
+
     await producer.send({
       topic,
       messages: [
         {
-          key: order_id,
-          value: JSON.stringify({ order_id, product_id, quantity }),
+          key: orderID,
+          value: JSON.stringify(newdata),
         },
       ],
     });
@@ -34,26 +42,66 @@ export const reserveInventory = async (data: inventoryReserveDTO) => {
   }
 };
 
-export const releaseInventory = async (data: inventoryReserveDTO) => {
-  const { order_id, product_id, quantity } = data;
+export const releaseInventory = async (data: sagaDTO) => {
+  const { orderID, productID, quantity } = data;
 
   try {
-    const result = await repository.releaseInventory(order_id, product_id);
+    const result = await repository.releaseInventory(orderID, productID);
 
     const topic = "inventory.released";
+
+    const newdata: sagaDTO = {
+      orderID: orderID,
+      sagaID: data.sagaID,
+      productID: productID,
+      quantity: quantity,
+      amount: data.amount,
+    };
 
     await producer.send({
       topic,
       messages: [
         {
-          key: order_id,
-          value: JSON.stringify({ order_id, product_id, quantity }),
+          key: orderID,
+          value: JSON.stringify(newdata),
         },
       ],
     });
     return result;
   } catch (error) {
     console.error("Service release error:", error);
+    throw error;
+  }
+};
+
+export const completeInventory = async (data: sagaDTO) => {
+  const { orderID, productID, quantity } = data;
+
+  try {
+    const result = await repository.completeInventory(orderID, productID);
+
+    const topic = "inventory.confirmed";
+
+    const newdata: sagaDTO = {
+      orderID: orderID,
+      sagaID: data.sagaID,
+      productID: productID,
+      quantity: quantity,
+      amount: data.amount,
+    };
+
+    await producer.send({
+      topic,
+      messages: [
+        {
+          key: orderID,
+          value: JSON.stringify(newdata),
+        },
+      ],
+    });
+    return result;
+  } catch (error) {
+    console.error("Service confirm error:", error);
     throw error;
   }
 };

@@ -104,7 +104,7 @@ export const releaseInventory = async (orderId: string, productId: string) => {
     await client.query(
       `
       UPDATE inventory_reservations
-      SET status = 'RELEASED'
+      SET status = 'CANCELLED'
       WHERE order_id = $1
       AND product_id = $2
       `,
@@ -118,6 +118,57 @@ export const releaseInventory = async (orderId: string, productId: string) => {
     await client.query("ROLLBACK");
     console.error(error);
     throw new Error("Inventory release failed");
+  } finally {
+    client.release();
+  }
+};
+
+export const completeInventory = async (orderId: string, productId: string) => {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const reservationResult = await client.query(
+      `
+      SELECT quantity, status
+      FROM inventory_reservations
+      WHERE order_id = $1
+      AND product_id = $2
+      FOR UPDATE
+      `,
+      [orderId, productId],
+    );
+
+    if (reservationResult.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return { status: "ALREADY_CONFIRMED" };
+    }
+
+    const { quantity, status } = reservationResult.rows[0];
+
+    if (status !== "RESERVED") {
+      await client.query("ROLLBACK");
+      return { status: "ALREADY_CONFIRMED" };
+    }
+
+    await client.query(
+      `
+      UPDATE inventory_reservations
+      SET status = 'COMPLETED'
+      WHERE order_id = $1
+      AND product_id = $2
+      `,
+      [orderId, productId],
+    );
+
+    await client.query("COMMIT");
+
+    return { status: "CONFIRMED" };
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    throw new Error("Inventory confirmation failed");
   } finally {
     client.release();
   }

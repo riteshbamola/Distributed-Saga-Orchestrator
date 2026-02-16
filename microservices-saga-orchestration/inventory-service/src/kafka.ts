@@ -18,7 +18,12 @@ export const connectKafka = async () => {
   await consumer.connect();
 
   await consumer.subscribe({
-    topics: ["inventory.reserve", "inventory.release", "inventory.handshake"],
+    topics: [
+      "inventory.reserve",
+      "inventory.release",
+      "inventory.complete",
+      "inventory.handshake",
+    ],
     fromBeginning: false,
   });
 
@@ -41,6 +46,11 @@ export const connectKafka = async () => {
           case "inventory.release":
             const releaseData = JSON.parse(message.value?.toString() || "{}");
             await service.releaseInventory(releaseData);
+            break;
+
+          case "inventory.complete":
+            const completeData = JSON.parse(message.value?.toString() || "{}");
+            await service.completeInventory(completeData);
             break;
         }
 
