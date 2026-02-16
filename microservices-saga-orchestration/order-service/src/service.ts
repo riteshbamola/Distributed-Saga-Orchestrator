@@ -1,6 +1,7 @@
 import * as orderRepository from "./model";
-import { OrderStatus, CreateOrderDTO, OrderData } from "./types/types";
+import { OrderStatus, CreateOrderDTO } from "./types/types";
 import { producer } from "./kafka";
+import crypto from "crypto";
 const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
   [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
   [OrderStatus.CONFIRMED]: [OrderStatus.CANCELLED],

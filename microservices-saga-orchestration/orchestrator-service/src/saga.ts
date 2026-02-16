@@ -138,7 +138,7 @@ export const handleinventoryCompleted = async (data: sagaDTO) => {
     const currstep = await repository.createSagaSteps(
       sagaID,
       "INVENTORY-COMPLETED",
-      "COMPLETE",
+      "COMPLETED",
     );
 
     const newdata: sagaDTO = {
@@ -168,7 +168,7 @@ export const handlePaymentSuccess = async (data: sagaDTO) => {
   try {
     const step = await repository.updateSagaStepStatus(
       sagaID,
-      "PAYMENT-REQUESTED",
+      "PAYMENT-REQUEST",
       "COMPLETED",
     );
 
@@ -202,7 +202,7 @@ export const handlePaymentFailed = async (data: sagaDTO) => {
   try {
     const step = await repository.updateSagaStepStatus(
       sagaID,
-      "PAYMENT-REQUESTED",
+      "PAYMENT-REQUEST",
       "FAILED",
     );
 

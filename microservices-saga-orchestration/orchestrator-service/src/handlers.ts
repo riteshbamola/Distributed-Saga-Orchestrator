@@ -33,7 +33,7 @@ export const handleMessage = async (topic: string, message: any) => {
       console.log("Inventory completed");
       break;
 
-    case "order.confirmed":
+    case "order.confirm":
       await sagaService.handleOrderConfirmed(data);
 
       console.log("Order confirmed");

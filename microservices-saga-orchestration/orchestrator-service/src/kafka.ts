@@ -45,7 +45,7 @@ const createTopics = async () => {
       waitForLeaders: true,
     });
   } catch (error) {
-    console.log("Errror generating topics");
+    console.log("Error generating topics");
     console.error(error);
   }
   await admin.disconnect();
