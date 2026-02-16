@@ -1,4 +1,4 @@
 export interface createPaymentDTO {
-  order_id: string;
+  orderID: string;
   amount: number;
 }
