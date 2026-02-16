@@ -16,7 +16,7 @@ const createTopics = async () => {
         // order service
         { topic: "order.created", numPartitions: 3, replicationFactor: 1 },
         { topic: "order.cancel", numPartitions: 3, replicationFactor: 1 },
-        {topic: "order.confirm",numPartitions: 3, replicationFactor: 1}
+        { topic: "order.confirm", numPartitions: 3, replicationFactor: 1 },
         { topic: "order.confirmed", numPartitions: 3, replicationFactor: 1 },
         { topic: "order.cancelled", numPartitions: 3, replicationFactor: 1 },
         { topic: "order.handshake", numPartitions: 1, replicationFactor: 1 },
@@ -27,7 +27,11 @@ const createTopics = async () => {
         { topic: "inventory.complete", numPartitions: 3, replicationFactor: 1 },
         { topic: "inventory.reserved", numPartitions: 3, replicationFactor: 1 },
         { topic: "inventory.released", numPartitions: 3, replicationFactor: 1 },
-        { topic: "inventory.completed", numPartitions: 3, replicationFactor: 1 },
+        {
+          topic: "inventory.completed",
+          numPartitions: 3,
+          replicationFactor: 1,
+        },
         { topic: "inventory.failed", numPartitions: 3, replicationFactor: 1 },
         {
           topic: "inventory.handshake",

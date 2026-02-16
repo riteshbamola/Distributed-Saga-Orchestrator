@@ -12,8 +12,8 @@ export interface CreateOrderDTO {
 }
 
 export interface OrderCreatedDTO {
-  orderId: string;
-  productId: string;
+  orderID: string;
+  productID: string;
   quantity: number;
   amount: number;
 }

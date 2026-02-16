@@ -36,8 +36,10 @@ export const createOrder = async (data: CreateOrderDTO) => {
           key: orderId,
           value: JSON.stringify({
             eventId: crypto.randomUUID(),
-            orderId,
-            ...orderData,
+            orderID: orderId,
+            productID: data.product_id,
+            quantity: data.quantity,
+            amount: data.amount,
             occurredAt: new Date().toISOString(),
           }),
         },
